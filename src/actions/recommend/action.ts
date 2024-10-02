@@ -10,6 +10,7 @@ import { generateObject } from "ai";
 import { Filter } from "bad-words";
 import { z } from "zod";
 import { sql } from "@vercel/postgres";
+import { unstable_noStore as noStore } from "next/cache";
 
 async function queryAlreadyExists(query: string) {
   // Check if query already exists in database
@@ -33,6 +34,7 @@ export async function generateEmojiRecommendations(
   formData: FormData,
 ) {
   try {
+    noStore();
     // Validate input
     const query = formData.get("query");
 
