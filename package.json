@@ -10,15 +10,13 @@
   },
   "dependencies": {
     "@ai-sdk/google": "^0.0.51",
-    "@hookform/resolvers": "^3.9.0",
     "@tailwindcss/typography": "^0.5.15",
-    "@vercel/kv": "^3.0.0",
+    "@vercel/postgres": "^0.10.0",
     "ai": "^3.4.7",
     "bad-words": "^4.0.0",
     "next": "14.2.13",
     "react": "^18",
     "react-dom": "^18",
-    "react-hook-form": "^7.53.0",
     "sonner": "^1.5.0",
     "zod": "^3.23.8"
   },

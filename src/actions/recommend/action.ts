@@ -9,6 +9,24 @@ import { google } from "@ai-sdk/google";
 import { generateObject } from "ai";
 import { Filter } from "bad-words";
 import { z } from "zod";
+import { sql } from "@vercel/postgres";
+
+async function queryAlreadyExists(query: string) {
+  // Check if query already exists in database
+
+  const res = await sql`
+        SELECT emoji_results 
+        FROM emoji_requests 
+        WHERE search_string = ${query};
+     `;
+
+  return res.rows;
+}
+
+async function cacheQuery(query: string, emojiResults: string) {
+  // Insert query into database
+  await sql`SELECT upsert_emoji_request(${query}, ${emojiResults});`;
+}
 
 export async function generateEmojiRecommendations(
   _: z.infer<typeof recommendationInputSchema>,
@@ -22,7 +40,16 @@ export async function generateEmojiRecommendations(
 
     if (!result.success) throw new Error("Invalid input provided");
 
-    const { query: sanitizedQuery } = result.data;
+    const { query: temp_query } = result.data;
+
+    const sanitizedQuery = temp_query.trim().toLowerCase();
+
+    const exists = await queryAlreadyExists(sanitizedQuery);
+    if (exists.length > 0) {
+      console.log("retrieved result from database");
+      cacheQuery(sanitizedQuery, exists[0].emoji_results);
+      return { result: exists[0].emoji_results };
+    }
 
     // Filter out profanity
     const filter = new Filter();
@@ -45,6 +72,8 @@ export async function generateEmojiRecommendations(
 
     // Handle rate-limiting or unexpected behavior
     if (finishReason !== "stop") throw new Error("Failed to generate object");
+
+    await cacheQuery(sanitizedQuery, JSON.stringify(object.response));
 
     // Return successful response
     return { result: object.response };
