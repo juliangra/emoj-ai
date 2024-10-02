@@ -7,7 +7,7 @@ export default function Hero() {
         <span className="logo-emojis">🤖</span>
       </h1>
       <p className="max-w-80 sm:max-w-full">
-        Utilize the power of{" "}
+        Utilise the power of{" "}
         <span className="tracking-wider font-bold badge badge-neutral">
           ✨AI ✨
         </span>{" "}
