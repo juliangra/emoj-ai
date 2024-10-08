@@ -9,8 +9,8 @@ import { google } from "@ai-sdk/google";
 import { generateObject } from "ai";
 import { Filter } from "bad-words";
 import { z } from "zod";
-import { sql } from "@vercel/postgres";
 import { unstable_noStore as noStore } from "next/cache";
+import sql from "@/db";
 
 async function queryAlreadyExists(query: string) {
   // Check if query already exists in database
@@ -48,8 +48,18 @@ export async function generateEmojiRecommendations(
 
     const exists = await queryAlreadyExists(sanitizedQuery);
     if (exists.length > 0) {
+      // console.log("retrieved result from database");
+      // cacheQuery(sanitizedQuery, exists[0].emoji_results);
+      // return { result: exists[0].emoji_results };
+
       console.log("retrieved result from database");
-      cacheQuery(sanitizedQuery, exists[0].emoji_results);
+      // Optionally update last_queried and total_queries
+      await sql`
+        UPDATE emoji_requests
+        SET last_queried = CURRENT_TIMESTAMP,
+            total_queries = total_queries + 1
+        WHERE search_string = ${sanitizedQuery};
+      `;
       return { result: exists[0].emoji_results };
     }
 
