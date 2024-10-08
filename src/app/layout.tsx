@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/react";
 import ToastProvider from "@/providers/ToastProvider";
 import Footer from "@/components/layout/Footer";
 
@@ -19,6 +20,7 @@ export default function RootLayout({
       <body className={`antialiased prose min-h-screen`}>
         <ToastProvider>{children}</ToastProvider>
         <Footer />
+        <Analytics />
       </body>
     </html>
   );
